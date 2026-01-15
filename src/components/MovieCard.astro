@@ -1,0 +1,149 @@
+---
+import { getImageUrl, formatRating, getYear } from '../lib/tmdb.mjs';
+
+interface Props {
+  movie: any;
+}
+
+const { movie } = Astro.props;
+const baseUrl = import.meta.env.BASE_URL || '/';
+const posterUrl = getImageUrl(movie.poster_path, 'w500');
+const rating = formatRating(movie.vote_average);
+const year = getYear(movie.release_date);
+---
+
+<a href={`${baseUrl}movie/${movie.id}`} class="movie-card">
+  <div class="poster-container">
+    <img 
+      src={posterUrl} 
+      alt={`${movie.title} poster`}
+      class="poster"
+      loading="lazy"
+    />
+    <div class="overlay">
+      <span class="view-details">View Details</span>
+    </div>
+  </div>
+  
+  <div class="movie-info">
+    <h3 class="movie-title">{movie.title}</h3>
+    
+    <div class="movie-meta">
+      <div class="rating">
+        <span class="star">⭐</span>
+        <span class="rating-value">{rating}</span>
+      </div>
+      <span class="year">{year}</span>
+    </div>
+  </div>
+</a>
+
+<style>
+  .movie-card {
+    display: block;
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: all var(--transition-base);
+    border: 1px solid var(--border-color);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .movie-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px var(--shadow);
+    border-color: var(--accent-primary);
+  }
+
+  .poster-container {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    background: var(--bg-secondary);
+  }
+
+  .poster {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-slow);
+  }
+
+  .movie-card:hover .poster {
+    transform: scale(1.1);
+  }
+
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: var(--spacing-md);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+  }
+
+  .movie-card:hover .overlay {
+    opacity: 1;
+  }
+
+  .view-details {
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .movie-info {
+    padding: var(--spacing-md);
+  }
+
+  .movie-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-xs);
+    color: var(--text-primary);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.4;
+  }
+
+  .movie-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.875rem;
+  }
+
+  .rating {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--accent-gold);
+    font-weight: 600;
+  }
+
+  .star {
+    font-size: 1rem;
+  }
+
+  .year {
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 640px) {
+    .movie-title {
+      font-size: 0.9rem;
+    }
+    
+    .movie-info {
+      padding: var(--spacing-sm);
+    }
+  }
+</style>

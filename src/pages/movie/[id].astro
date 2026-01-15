@@ -1,0 +1,25 @@
+---
+import { getPopularMovies, getMovieDetails } from '../../lib/tmdb.mjs';
+import MovieDetail from '../../components/MovieDetail.astro';
+
+export async function getStaticPaths() {
+  try {
+    const movies = await getPopularMovies(1);
+    const paths = await Promise.all(movies.map(async (movie) => {
+      const details = await getMovieDetails(movie.id);
+      return {
+        params: { id: movie.id.toString() },
+        props: { movie: details }
+      };
+    }));
+    return paths;
+  } catch (error) {
+    console.error('Error in getStaticPaths:', error);
+    return [];
+  }
+}
+
+const { movie } = Astro.props;
+---
+
+<MovieDetail movie={movie} />

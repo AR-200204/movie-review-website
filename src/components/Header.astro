@@ -1,0 +1,98 @@
+---
+const baseUrl = import.meta.env.BASE_URL || '/';
+---
+
+<header class="header">
+  <div class="container">
+    <div class="header-content">
+      <a href={baseUrl} class="logo">
+        <span class="logo-icon">🎬</span>
+        <span class="logo-text">MovieHub</span>
+      </a>
+      
+      <div class="tmdb-attribution">
+        <span class="attribution-text">Powered by</span>
+        <img 
+          src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_short-8e7b30f73a4020692ccca9c88bafe5dcb6f8a62a4c6bc55cd9ba82bb2cd95f6c.svg" 
+          alt="TMDB Logo" 
+          class="tmdb-logo"
+        />
+      </div>
+    </div>
+  </div>
+</header>
+
+<style>
+  .header {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    padding: var(--spacing-md) 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+    background: rgba(21, 27, 43, 0.95);
+  }
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: transform var(--transition-base);
+  }
+
+  .logo:hover {
+    transform: scale(1.05);
+  }
+
+  .logo-icon {
+    font-size: 2rem;
+  }
+
+  .logo-text {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .tmdb-attribution {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+
+  .attribution-text {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+
+  .tmdb-logo {
+    height: 20px;
+    width: auto;
+  }
+
+  @media (max-width: 640px) {
+    .logo-text {
+      font-size: 1.25rem;
+    }
+    
+    .attribution-text {
+      display: none;
+    }
+    
+    .tmdb-logo {
+      height: 16px;
+    }
+  }
+</style>

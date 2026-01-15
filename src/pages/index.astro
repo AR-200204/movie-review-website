@@ -1,0 +1,140 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import MovieCard from '../components/MovieCard.astro';
+import { getPopularMovies } from '../lib/tmdb.mjs';
+
+// Fetch popular movies at BUILD TIME
+const movies = await getPopularMovies(1);
+---
+
+<Layout 
+  title="MovieHub - Discover Popular Movies"
+  description="Explore the latest and most popular movies. Updated daily with fresh content from TMDB."
+>
+  <Header />
+  
+  <main>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="container">
+        <h1 class="hero-title fade-in">
+          Discover <span class="gradient-text">Popular Movies</span>
+        </h1>
+        <p class="hero-description fade-in">
+          Your daily dose of cinema. Explore the most popular movies, updated automatically every day.
+        </p>
+      </div>
+    </section>
+
+    <!-- Movies Grid -->
+    <section class="movies-section">
+      <div class="container">
+        <div class="movies-grid">
+          {movies.map((movie) => (
+            <MovieCard movie={movie} />
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <p class="footer-text">
+          This product uses the TMDB API but is not endorsed or certified by TMDB.
+        </p>
+        <p class="footer-credits">
+          Built with ❤️ using Astro • Auto-updated daily via GitHub Actions
+        </p>
+      </div>
+    </footer>
+  </main>
+</Layout>
+
+<style>
+  main {
+    min-height: 100vh;
+  }
+
+  /* Hero Section */
+  .hero {
+    padding: var(--spacing-xl) 0;
+    text-align: center;
+    background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .hero-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    margin-bottom: var(--spacing-md);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .hero-description {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* Movies Section */
+  .movies-section {
+    padding: var(--spacing-xl) 0;
+  }
+
+  .movies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--spacing-lg);
+    animation: fadeIn 0.6s ease-out;
+  }
+
+  /* Footer */
+  .footer {
+    margin-top: var(--spacing-xl);
+    padding: var(--spacing-xl) 0;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+  }
+
+  .footer-text {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .footer-credits {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .movies-grid {
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: var(--spacing-md);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .movies-grid {
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: var(--spacing-md);
+    }
+    
+    .hero {
+      padding: var(--spacing-lg) 0;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .movies-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--spacing-sm);
+    }
+  }
+</style>
