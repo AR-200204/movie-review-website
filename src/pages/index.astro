@@ -5,7 +5,18 @@ import MovieCard from '../components/MovieCard.astro';
 import { getPopularMovies } from '../lib/tmdb.mjs';
 
 // Fetch popular movies at BUILD TIME
-const movies = await getPopularMovies(1);
+// This only runs during static generation, never in the browser
+let movies = [];
+try {
+  movies = await getPopularMovies(1);
+} catch (error) {
+  console.error('Failed to fetch movies during build:', error);
+  // Build will fail here if TMDB_API_KEY is not available
+  throw new Error(
+    'Cannot build site without TMDB API key. ' +
+    'Ensure TMDB_API_KEY environment variable is set.'
+  );
+}
 ---
 
 <Layout 

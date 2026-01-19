@@ -43,6 +43,19 @@ jobs:
       - name: Install dependencies
         run: npm ci
         
+      - name: Validate TMDB API Key
+        run: |
+          if [ -z "${{ secrets.TMDB_API_KEY }}" ]; then
+            echo "❌ Error: TMDB_API_KEY secret is not configured"
+            echo "Please add TMDB_API_KEY to your GitHub repository secrets"
+            echo "1. Go to Settings > Secrets and variables > Actions"
+            echo "2. Click 'New repository secret'"
+            echo "3. Name: TMDB_API_KEY"
+            echo "4. Value: Your TMDB API key from https://www.themoviedb.org/settings/api"
+            exit 1
+          fi
+          echo "✅ TMDB_API_KEY is configured"
+        
       - name: Build with Astro
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
@@ -63,3 +76,4 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+

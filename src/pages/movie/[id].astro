@@ -5,17 +5,32 @@ import MovieDetail from '../../components/MovieDetail.astro';
 export async function getStaticPaths() {
   try {
     const movies = await getPopularMovies(1);
+    
+    if (!movies || movies.length === 0) {
+      throw new Error('No movies returned from TMDB API');
+    }
+
     const paths = await Promise.all(movies.map(async (movie) => {
-      const details = await getMovieDetails(movie.id);
-      return {
-        params: { id: movie.id.toString() },
-        props: { movie: details }
-      };
+      try {
+        const details = await getMovieDetails(movie.id);
+        return {
+          params: { id: movie.id.toString() },
+          props: { movie: details }
+        };
+      } catch (error) {
+        console.error(`Failed to fetch details for movie ${movie.id}:`, error);
+        throw error;
+      }
     }));
+    
     return paths;
   } catch (error) {
-    console.error('Error in getStaticPaths:', error);
-    return [];
+    console.error('Fatal error in getStaticPaths:', error);
+    // Re-throw to fail the build if API calls fail
+    throw new Error(
+      `Cannot generate movie pages: ${error.message}. ` +
+      'Verify TMDB_API_KEY is valid and the API is accessible.'
+    );
   }
 }
 
@@ -23,3 +38,4 @@ const { movie } = Astro.props;
 ---
 
 <MovieDetail movie={movie} />
+

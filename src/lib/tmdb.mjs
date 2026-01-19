@@ -1,8 +1,18 @@
 // TMDB API Configuration
 // Use process.env for build-time access (Astro frontmatter and getStaticPaths)
+// SECURITY: Never expose API key to browser or use PUBLIC_ prefix
 const TMDB_API_KEY = process.env.TMDB_API_KEY;
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p';
+
+// Validate API key is available at build time
+if (!TMDB_API_KEY) {
+    throw new Error(
+        'TMDB_API_KEY environment variable is not set. ' +
+        'For local development: Create a .env file with TMDB_API_KEY=your_key\n' +
+        'For GitHub Actions: Add TMDB_API_KEY to repository secrets'
+    );
+}
 
 /**
  * Fetch popular movies from TMDB
