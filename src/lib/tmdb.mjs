@@ -1,5 +1,6 @@
 // TMDB API Configuration
-const TMDB_API_KEY = import.meta.env.TMDB_API_KEY;
+// Use process.env for build-time access (Astro frontmatter and getStaticPaths)
+const TMDB_API_KEY = process.env.TMDB_API_KEY;
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p';
 
