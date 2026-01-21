@@ -37,32 +37,64 @@ jobs:
       - name: Install dependencies
         run: npm ci
         
-      - name: Validate TMDB API Key
-        run: |
-          if [ -z "${{ secrets.TMDB_API_KEY }}" ]; then
-            echo "❌ Error: TMDB_API_KEY secret is not configured"
-            echo "Please add TMDB_API_KEY to your GitHub repository secrets"
-            echo "📍 Steps to add the secret:"
-            echo "1. Go to your repository on GitHub"
-            echo "2. Click Settings > Secrets and variables > Actions"
-            echo "3. Click 'New repository secret'"
-            echo "4. Name: TMDB_API_KEY"
-            echo "5. Value: Your TMDB API key from https://www.themoviedb.org/settings/api"
-            exit 1
-          fi
-          echo "✅ TMDB_API_KEY is configured"
-          
-      - name: Test TMDB API Key
+      - name: Validate and Test TMDB API Key
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
         run: |
-          echo "Testing TMDB API connection..."
-          response=$(curl -s -o /dev/null -w "%{http_code}" "https://api.themoviedb.org/3/movie/popular?api_key=$TMDB_API_KEY")
-          if [ "$response" -eq 200 ]; then
-            echo "✅ TMDB API key is valid and working"
+          echo "🔍 Checking TMDB API Key configuration..."
+          
+          # Check if the environment variable is set
+          if [ -z "$TMDB_API_KEY" ]; then
+            echo ""
+            echo "❌ ERROR: TMDB_API_KEY is not configured!"
+            echo ""
+            echo "📋 To fix this, follow these steps:"
+            echo "1. Get your TMDB API key:"
+            echo "   → Go to https://www.themoviedb.org/settings/api"
+            echo "   → If you don't have one, click 'Request an API Key'"
+            echo "   → Copy your API key (v3 auth)"
+            echo ""
+            echo "2. Add it to GitHub Secrets:"
+            echo "   → Go to your repository: Settings > Secrets and variables > Actions"
+            echo "   → Click 'New repository secret'"
+            echo "   → Name: TMDB_API_KEY"
+            echo "   → Value: [paste your API key]"
+            echo "   → Click 'Add secret'"
+            echo ""
+            exit 1
+          fi
+          
+          echo "✅ TMDB_API_KEY environment variable is set"
+          echo "🔑 Key length: ${#TMDB_API_KEY} characters"
+          
+          # Test the API key
+          echo ""
+          echo "🧪 Testing API key with TMDB..."
+          response=$(curl -s -w "\n%{http_code}" "https://api.themoviedb.org/3/movie/popular?api_key=$TMDB_API_KEY")
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | head -n-1)
+          
+          echo "📡 HTTP Status Code: $http_code"
+          
+          if [ "$http_code" -eq 200 ]; then
+            echo "✅ TMDB API key is VALID and working!"
+          elif [ "$http_code" -eq 401 ]; then
+            echo ""
+            echo "❌ ERROR: TMDB API returned 401 Unauthorized"
+            echo ""
+            echo "This means your API key is invalid or expired."
+            echo ""
+            echo "🔧 To fix this:"
+            echo "1. Verify your API key at: https://www.themoviedb.org/settings/api"
+            echo "2. Make sure you're using the 'API Key (v3 auth)' not the 'API Read Access Token'"
+            echo "3. Update the GitHub secret with the correct key"
+            echo ""
+            echo "Response: $body"
+            exit 1
           else
-            echo "❌ TMDB API returned status code: $response"
-            echo "Please verify your API key is correct"
+            echo ""
+            echo "❌ ERROR: TMDB API returned unexpected status: $http_code"
+            echo "Response: $body"
             exit 1
           fi
         
