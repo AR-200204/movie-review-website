@@ -1,29 +1,23 @@
 name: Deploy to GitHub Pages
-
 on:
   # Runs on pushes targeting the main branch
   push:
     branches: ["main"]
-
   # Daily automatic rebuild at 00:00 UTC (midnight)
   schedule:
     - cron: "0 0 * * *"
-
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
-
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
   group: "pages"
   cancel-in-progress: false
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -48,13 +42,29 @@ jobs:
           if [ -z "${{ secrets.TMDB_API_KEY }}" ]; then
             echo "❌ Error: TMDB_API_KEY secret is not configured"
             echo "Please add TMDB_API_KEY to your GitHub repository secrets"
-            echo "1. Go to Settings > Secrets and variables > Actions"
-            echo "2. Click 'New repository secret'"
-            echo "3. Name: TMDB_API_KEY"
-            echo "4. Value: Your TMDB API key from https://www.themoviedb.org/settings/api"
+            echo "📍 Steps to add the secret:"
+            echo "1. Go to your repository on GitHub"
+            echo "2. Click Settings > Secrets and variables > Actions"
+            echo "3. Click 'New repository secret'"
+            echo "4. Name: TMDB_API_KEY"
+            echo "5. Value: Your TMDB API key from https://www.themoviedb.org/settings/api"
             exit 1
           fi
           echo "✅ TMDB_API_KEY is configured"
+          
+      - name: Test TMDB API Key
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        run: |
+          echo "Testing TMDB API connection..."
+          response=$(curl -s -o /dev/null -w "%{http_code}" "https://api.themoviedb.org/3/movie/popular?api_key=$TMDB_API_KEY")
+          if [ "$response" -eq 200 ]; then
+            echo "✅ TMDB API key is valid and working"
+          else
+            echo "❌ TMDB API returned status code: $response"
+            echo "Please verify your API key is correct"
+            exit 1
+          fi
         
       - name: Build with Astro
         env:
@@ -65,7 +75,6 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
-
   deploy:
     environment:
       name: github-pages
@@ -76,4 +85,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
