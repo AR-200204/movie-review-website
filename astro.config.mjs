@@ -1,11 +1,7 @@
-import { defineConfig } from 'astro/config';
+import { defineConfig } from 'astro';
 
-// https://astro.build/config
 export default defineConfig({
-  site: 'https://ar-200204.github.io',
-  base: '/movie-review-website',
+  site: 'https://YOUR_USERNAME.github.io',
+  base: '/YOUR_REPO_NAME/',
   output: 'static',
-  build: {
-    assets: 'assets'
-  }
 });
